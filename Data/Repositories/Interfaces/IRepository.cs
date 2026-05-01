@@ -1,6 +1,8 @@
-﻿namespace Data.Repositories.Interfaces
+﻿using Data.Entities;
+
+namespace Data.Repositories.Interfaces
 {
-    public interface IRepository<T>
+    public interface IRepository<T> where T : BaseEntity
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(Guid id);
