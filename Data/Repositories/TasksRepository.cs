@@ -11,32 +11,12 @@ namespace Data.Repositories
 
         public async Task<TaskEntity?> GetByIdAsync(Guid id)
         {
-            return await context.Tasks.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+            return await context.Tasks.AsNoTracking().Include(t => t.Category).FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<IEnumerable<TaskEntity>> GetAllAsync()
+        public async Task<PagedResult<TaskEntity>> GetPaginatedTasksAsync(Guid userId, TasksPaginationParameters paginationParameters)
         {
-            return await context.Tasks.AsNoTracking().ToListAsync();
-        }
-
-        public void Add(TaskEntity task)
-        {
-            context.Tasks.Add(task);
-        }
-
-        public void Delete(TaskEntity task)
-        {
-            context.Tasks.Remove(task);
-        }
-
-        public void Update(TaskEntity task)
-        {
-            context.Tasks.Update(task);
-        }
-
-        public async Task<PagedResult<TaskEntity>> GetPaginatedTasksAsync(TasksPaginationParameters paginationParameters)
-        {
-            var result = context.Tasks.AsNoTracking();
+            var result = context.Tasks.AsNoTracking().Where(t => t.UserId == userId);
 
             if (!string.IsNullOrWhiteSpace(paginationParameters.SearchName))
             {
@@ -52,7 +32,7 @@ namespace Data.Repositories
 
             var skipCount = (paginationParameters.PageNumber - 1) * paginationParameters.PageSize;
 
-            var items = await result.Skip(Math.Max(0, skipCount)).Take(paginationParameters.PageSize).ToListAsync();
+            var items = await result.Skip(Math.Max(0, skipCount)).Take(paginationParameters.PageSize).Include(t => t.Category).ToListAsync();
 
             return new PagedResult<TaskEntity>
             {
@@ -61,6 +41,21 @@ namespace Data.Repositories
                 PageNumber = paginationParameters.PageNumber,
                 PageSize = paginationParameters.PageSize
             };
+        }
+
+        public void Add(TaskEntity task)
+        {
+            context.Tasks.Add(task);
+        }
+
+        public void Delete(TaskEntity entity)
+        {
+            context.Tasks.Remove(entity);
+        }
+
+        public void Update(TaskEntity task)
+        {
+            context.Tasks.Update(task);
         }
     }
 }

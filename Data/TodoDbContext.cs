@@ -20,6 +20,11 @@ namespace Data
             modelBuilder.Entity<CategoryEntity>().ToTable("Categories");
             modelBuilder.Entity<TaskEntity>().ToTable("Tasks");
 
+            modelBuilder.Entity<CategoryEntity>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Categories)
+                .HasForeignKey(c => c.UserId);
+
             modelBuilder.Entity<TaskEntity>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tasks)

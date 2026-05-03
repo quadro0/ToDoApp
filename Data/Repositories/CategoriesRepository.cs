@@ -10,12 +10,17 @@ namespace Data.Repositories
 
         public async Task<CategoryEntity?> GetByIdAsync(Guid id)
         {
-            return await context.Categories.AsNoTracking().Include(c => c.Tasks).FirstOrDefaultAsync(c => c.Id == id);
+            return await context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<IEnumerable<CategoryEntity>> GetAllAsync()
+        public async Task<CategoryEntity?> GetByNameAsync(Guid userId, string name)
         {
-            return await context.Categories.AsNoTracking().Include(c => c.Tasks).ToListAsync();
+            return await context.Categories.AsNoTracking().Where(c => c.UserId == userId).FirstOrDefaultAsync(c => c.Name == name);
+        }
+
+        public async Task<IEnumerable<CategoryEntity>> GetAllAsync(Guid userId)
+        {
+            return await context.Categories.AsNoTracking().Where(c => c.UserId == userId).Include(c => c.Tasks).ToListAsync();
         }
 
         public void Add(CategoryEntity category)
@@ -23,14 +28,14 @@ namespace Data.Repositories
             context.Categories.Add(category);
         }
 
-        public void Delete(CategoryEntity category)
-        {
-            context.Categories.Remove(category);
-        }
-
         public void Update(CategoryEntity category)
         {
             context.Categories.Update(category);
+        }
+
+        public void Delete(CategoryEntity entity)
+        {
+            context.Categories.Remove(entity);
         }
     }
 }

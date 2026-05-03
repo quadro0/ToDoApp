@@ -13,6 +13,11 @@ namespace Data.Repositories
             return await context.Users.AsNoTracking().Include(u => u.Tasks).FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<UserEntity?> GetByEmailAsync(string email)
+        {
+            return await context.Users.AsNoTracking().Include(u => u.Tasks).FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<IEnumerable<UserEntity>> GetAllAsync()
         {
             return await context.Users.AsNoTracking().Include(u => u.Tasks).ToListAsync();
@@ -23,9 +28,9 @@ namespace Data.Repositories
            context.Users.Add(user);
         }
 
-        public void Delete(UserEntity user)
+        public void Delete(UserEntity entity)
         {
-            context.Users.Remove(user);
+            context.Users.Remove(entity);
         }
 
         public void Update(UserEntity user)
